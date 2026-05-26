@@ -24,10 +24,7 @@ export default async function handler(req) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              maxOutputTokens: 300,
-              temperature: 0.7
-            }
+            generationConfig: { maxOutputTokens: 600, temperature: 0.7 }
           }),
         }
       );
@@ -40,36 +37,22 @@ export default async function handler(req) {
       });
     }
 
-    // 画像生成（Gemini 2.5 Flash Image）
+    // 画像生成（Pollinations AI - 無料・登録不要）
     if (type === 'image') {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              responseModalities: ['TEXT', 'IMAGE']
-            }
-          }),
-        }
-      );
-      const data = await res.json();
-      if (data.error) throw new Error(data.error.message);
+      const encodedPrompt = encodeURIComponent(prompt);
+      const seed = Math.floor(Math.random() * 999999);
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=576&height=768&seed=${seed}&model=flux&nologo=true`;
 
-      const parts = data.candidates?.[0]?.content?.parts || [];
-      const imgPart = parts.find(p =>
-        p.inlineData && p.inlineData.mimeType && p.inlineData.mimeType.startsWith('image/')
-      );
+      // URLから画像を取得してbase64に変換
+      const imgRes = await fetch(imageUrl);
+      if (!imgRes.ok) throw new Error('画像の生成に失敗しました');
 
-      if (imgPart) {
-        return new Response(JSON.stringify({ imageBase64: imgPart.inlineData.data }), {
-          status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      } else {
-        throw new Error('画像を生成できませんでした。もう一度お試しください。');
-      }
+      const arrayBuffer = await imgRes.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+
+      return new Response(JSON.stringify({ imageBase64: base64 }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
     throw new Error('Invalid type');
