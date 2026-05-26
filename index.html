@@ -364,6 +364,17 @@ function renderQuestion(idx){
       },300);
     });
   });
+
+  // 戻るボタン（最初の質問以外に表示）
+  if(idx > 0){
+    const backBtn = document.createElement('button');
+    backBtn.textContent = '← 前の質問に戻る';
+    backBtn.style.cssText = 'width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid #e8e6e0;background:transparent;color:#aaa;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;transition:all .15s';
+    backBtn.onmouseenter = ()=>{ backBtn.style.color='#555'; backBtn.style.borderColor='#aaa'; };
+    backBtn.onmouseleave = ()=>{ backBtn.style.color='#aaa'; backBtn.style.borderColor='#e8e6e0'; };
+    backBtn.onclick = ()=>{ renderQuestion(idx-1); };
+    document.getElementById('question-area').querySelector('.q-card').appendChild(backBtn);
+  }
 }
 
 // ========== 地毛の長さ選択 ==========
@@ -393,47 +404,62 @@ function renderPhotoStep(){
   document.getElementById('photo-area').innerHTML=`
     <div class="q-card">
       <div class="q-step">最後のステップ</div>
-      <div class="q-title">2枚の写真を撮影してください</div>
-      <div class="q-hint">顔・髪全体の写真と毛先の写真で診断精度が上がります</div>
+      <div class="q-title">写真を追加してください</div>
+      <div class="q-hint">撮影またはアップロードで追加できます。顔・髪全体と毛先の2枚で精度アップ！</div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-        <!-- 顔・髪全体 -->
         <div>
           <div style="font-size:11px;font-weight:700;color:#aaa;margin-bottom:6px;letter-spacing:.05em">① 顔・髪全体</div>
-          <div class="mini-cam" id="face-area" onclick="triggerUpload('face')"
-            style="background:#f5f0ee;border:1.5px dashed #e0c8c0;border-radius:12px;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;overflow:hidden;position:relative">
+          <div id="face-area" style="background:#f5f0ee;border:1.5px dashed #e0c8c0;border-radius:12px;aspect-ratio:3/4;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <canvas id="face-canvas" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></canvas>
+            <video id="face-video" autoplay playsinline muted style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></video>
             <div id="face-ph" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#c8a898;pointer-events:none">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              <span style="font-size:11px;font-weight:500">タップして追加</span>
+              <span style="font-size:11px;font-weight:500">追加してください</span>
             </div>
             <div id="face-ok" style="display:none;position:absolute;top:6px;right:6px;background:#c8806a;color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:2px 8px">✓ OK</div>
           </div>
-          <div class="cam-btns" style="grid-template-columns:1fr;margin-top:6px">
-            <button class="cam-btn" onclick="event.stopPropagation();startCam('face')" style="font-size:11px;padding:8px">📷 カメラ</button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px">
+            <button onclick="startCam('face')" style="padding:8px 4px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:11px;font-family:inherit;cursor:pointer;font-weight:500;color:#555;transition:all .15s">📷 カメラ</button>
+            <button onclick="triggerUpload('face')" style="padding:8px 4px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:11px;font-family:inherit;cursor:pointer;font-weight:500;color:#555;transition:all .15s">⬆ 選択</button>
+          </div>
+          <div id="face-cam-controls" style="display:none;margin-top:4px">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">
+              <button onclick="switchCam('face')" style="padding:7px 2px;border-radius:8px;border:1px solid #e0c8c0;background:#fdf5f3;font-size:10px;font-family:inherit;cursor:pointer;color:#c8806a;font-weight:600">🔄 切替</button>
+              <button onclick="snapCam('face')" style="padding:7px 2px;border-radius:8px;border:none;background:#c8806a;color:#fff;font-size:10px;font-family:inherit;cursor:pointer;font-weight:700">⭕ 撮影</button>
+              <button onclick="stopCam('face')" style="padding:7px 2px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:10px;font-family:inherit;cursor:pointer;color:#aaa">✕ 閉じる</button>
+            </div>
           </div>
         </div>
 
-        <!-- 毛先 -->
         <div>
           <div style="font-size:11px;font-weight:700;color:#aaa;margin-bottom:6px;letter-spacing:.05em">② 毛先の色</div>
-          <div class="mini-cam" id="tips-area" onclick="triggerUpload('tips')"
-            style="background:#f5f0ee;border:1.5px dashed #e0c8c0;border-radius:12px;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;overflow:hidden;position:relative">
+          <div id="tips-area" style="background:#f5f0ee;border:1.5px dashed #e0c8c0;border-radius:12px;aspect-ratio:3/4;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <canvas id="tips-canvas" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></canvas>
+            <video id="tips-video" autoplay playsinline muted style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></video>
             <div id="tips-ph" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#c8a898;pointer-events:none">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              <span style="font-size:11px;font-weight:500">タップして追加</span>
+              <span style="font-size:11px;font-weight:500">追加してください</span>
             </div>
             <div id="tips-ok" style="display:none;position:absolute;top:6px;right:6px;background:#c8806a;color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:2px 8px">✓ OK</div>
           </div>
-          <div class="cam-btns" style="grid-template-columns:1fr;margin-top:6px">
-            <button class="cam-btn" onclick="event.stopPropagation();startCam('tips')" style="font-size:11px;padding:8px">📷 カメラ</button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px">
+            <button onclick="startCam('tips')" style="padding:8px 4px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:11px;font-family:inherit;cursor:pointer;font-weight:500;color:#555;transition:all .15s">📷 カメラ</button>
+            <button onclick="triggerUpload('tips')" style="padding:8px 4px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:11px;font-family:inherit;cursor:pointer;font-weight:500;color:#555;transition:all .15s">⬆ 選択</button>
+          </div>
+          <div id="tips-cam-controls" style="display:none;margin-top:4px">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">
+              <button onclick="switchCam('tips')" style="padding:7px 2px;border-radius:8px;border:1px solid #e0c8c0;background:#fdf5f3;font-size:10px;font-family:inherit;cursor:pointer;color:#c8806a;font-weight:600">🔄 切替</button>
+              <button onclick="snapCam('tips')" style="padding:7px 2px;border-radius:8px;border:none;background:#c8806a;color:#fff;font-size:10px;font-family:inherit;cursor:pointer;font-weight:700">⭕ 撮影</button>
+              <button onclick="stopCam('tips')" style="padding:7px 2px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:10px;font-family:inherit;cursor:pointer;color:#aaa">✕ 閉じる</button>
+            </div>
           </div>
         </div>
       </div>
 
       <div style="font-size:11px;color:#bbb;text-align:center;margin-bottom:10px">※顔写真のみでも診断できます</div>
       <button class="cam-btn primary" id="bdiag" onclick="doDiagnose()" style="display:none;width:100%">✦ 診断する</button>
+      <button onclick="renderQuestion(QUESTIONS.length-1)" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid #e8e6e0;background:transparent;color:#aaa;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500">← 前の質問に戻る</button>
       <input type="file" id="fi-face" accept="image/*" style="display:none" onchange="loadImg(event,'face')">
       <input type="file" id="fi-tips" accept="image/*" style="display:none" onchange="loadImg(event,'tips')">
     </div>
@@ -441,34 +467,57 @@ function renderPhotoStep(){
 }
 
 let activeCamTarget = null;
+let camFacingMode = {face: 'user', tips: 'environment'};
+
 function triggerUpload(target){ document.getElementById('fi-'+target).click(); }
 
 function startCam(target){
   activeCamTarget = target;
-  navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}})
+  const facing = camFacingMode[target] || 'user';
+  navigator.mediaDevices.getUserMedia({video:{facingMode: facing}})
     .then(s=>{
-      stream=s;
-      // シンプルにスナップして終了
-      const v = document.createElement('video');
-      v.srcObject=s; v.autoplay=true; v.playsinline=true;
-      v.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9999;background:#000';
-      const btn = document.createElement('button');
-      btn.textContent='📷 撮影する';
-      btn.style.cssText='position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:10000;padding:14px 32px;border-radius:30px;background:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3)';
-      btn.onclick=()=>{
-        const c=document.createElement('canvas');
-        c.width=v.videoWidth;c.height=v.videoHeight;
-        const x=c.getContext('2d');x.scale(-1,1);x.drawImage(v,-c.width,0);
-        processCanvas(c, target);
-        s.getTracks().forEach(t=>t.stop());
-        document.body.removeChild(v);
-        document.body.removeChild(btn);
-        stream=null;
-      };
-      document.body.appendChild(v);
-      document.body.appendChild(btn);
+      if(stream) stream.getTracks().forEach(t=>t.stop());
+      stream = s;
+      const v = document.getElementById(target+'-video');
+      v.srcObject = s;
+      v.style.display = 'block';
+      document.getElementById(target+'-ph').style.display = 'none';
+      document.getElementById(target+'-canvas').style.display = 'none';
+      document.getElementById(target+'-ok').style.display = 'none';
+      document.getElementById(target+'-cam-controls').style.display = 'block';
     })
     .catch(()=>{ triggerUpload(target); });
+}
+
+function switchCam(target){
+  camFacingMode[target] = camFacingMode[target]==='user' ? 'environment' : 'user';
+  if(stream) stream.getTracks().forEach(t=>t.stop());
+  startCam(target);
+}
+
+function snapCam(target){
+  const v = document.getElementById(target+'-video');
+  const c = document.getElementById(target+'-canvas');
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  const ctx = c.getContext('2d');
+  // インカメの場合は左右反転
+  if(camFacingMode[target]==='user'){
+    ctx.scale(-1,1); ctx.drawImage(v,-c.width,0);
+  } else {
+    ctx.drawImage(v,0,0);
+  }
+  stopCam(target);
+  processCanvas(c, target);
+}
+
+function stopCam(target){
+  if(stream) { stream.getTracks().forEach(t=>t.stop()); stream=null; }
+  const v = document.getElementById(target+'-video');
+  if(v){ v.style.display='none'; v.srcObject=null; }
+  document.getElementById(target+'-cam-controls').style.display='none';
+  // 写真がなければプレースホルダーを戻す
+  if(!faceImgData && target==='face') document.getElementById('face-ph').style.display='flex';
+  if(!tipsImgData && target==='tips') document.getElementById('tips-ph').style.display='flex';
 }
 
 function loadImg(e, target){
@@ -764,9 +813,10 @@ async function callAI(hairLabel,matchTop,lighterTop,darkerTop,designPool,grade,l
 現状に合うカラー：${matchStr}、明るくするなら：${lightStr}、暗くするなら：${darkStr}、取付け本数：${honsu}本。
 親しみやすい美容師口調で220字以内で、現状カラーの理由・チェンジカラーの提案・本数の理由を自然な文章で伝えてください。`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})});
+    const res=await fetch('https://pull-exte-api.vercel.app/api/generate-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'comment',prompt:prompt})});
     const data=await res.json();
-    const rawText=data.content?.find(b=>b.type==='text')?.text||'提案を生成できませんでした。';
+    if(data.error) throw new Error(data.error);
+    const rawText=data.text||'提案を生成できませんでした。';
     // **マークダウン除去・！や。で改行
     const cleanText = rawText
       .replace(/\*\*/g, '')
@@ -853,7 +903,7 @@ function selectImageColor(id, hex, idx) {
     const res = await fetch('https://pull-exte-api.vercel.app/api/generate-image', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ prompt: prompt })
+      body: JSON.stringify({ type: 'image', prompt: prompt })
     });
 
     const data = await res.json();
