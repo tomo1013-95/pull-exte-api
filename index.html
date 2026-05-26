@@ -917,10 +917,22 @@ function selectImageColor(id, hex, idx) {
   const prompt = 'professional beauty salon photo, photorealistic portrait, young Japanese woman 20s, front view, natural smile, long straight silky hair reaching ' + lengthEn + ', hair color ' + colorName + ' ' + colorId + ', glossy smooth hair, soft studio lighting, white background, 4K sharp focus, natural skin, light pink top, hyperrealistic photography, Canon 85mm, not anime not illustration';
 
   try {
+    // 顔写真をbase64で取得してAPIに送る
+    let faceB64 = '';
+    const faceCanvas = document.getElementById('face-canvas');
+    if (faceCanvas && faceCanvas.width > 0) {
+      faceB64 = faceCanvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+    }
+
+    // プロンプトを顔写真有無で切り替え
+    const finalPrompt = faceB64
+      ? 'この人物の写真を編集してください。髪の長さを' + lengthEn + 'にして、髪の色を' + colorName + '(' + colorId + ')に変更してください。顔・表情・体型はそのままにして、髪だけ自然に変更してください。リアルな写真風で仕上げてください。'
+      : prompt;
+
     const res = await fetch('https://pull-exte-api.vercel.app/api/generate-image', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ type: 'image', prompt: prompt })
+      body: JSON.stringify({ type: 'image', prompt: finalPrompt, imageBase64: faceB64 })
     });
 
     const data = await res.json();
