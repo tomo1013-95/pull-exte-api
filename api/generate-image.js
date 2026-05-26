@@ -20,8 +20,11 @@ export default async function handler(req, res) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 1000, temperature: 0.7 },
-          thinkingConfig: { thinkingBudget: 0 }
+          generationConfig: {
+            maxOutputTokens: 2000,
+            temperature: 0.7,
+            thinkingConfig: { thinkingBudget: 0 }
+          }
         }),
       });
 
