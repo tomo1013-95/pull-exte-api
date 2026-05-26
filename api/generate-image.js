@@ -15,10 +15,10 @@ export default async function handler(req) {
     const { prompt, type } = await req.json();
     const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
-    // AIコメント生成（Gemini Flash）
+    // AIコメント生成（Gemini 2.5 Flash）
     if (type === 'comment') {
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -37,31 +37,34 @@ export default async function handler(req) {
       });
     }
 
-    // 画像生成（Gemini Imagen3 Fast）
+    // 画像生成（Gemini 2.5 Flash Image）
     if (type === 'image') {
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${GEMINI_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${GEMINI_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            instances: [{ prompt }],
-            parameters: {
-              sampleCount: 1,
-              aspectRatio: '3:4',
-              personGeneration: 'allow_adult',
-              negativePrompt: 'illustration, anime, cartoon, blurry, distorted, low quality',
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseModalities: ['TEXT', 'IMAGE']
             }
           }),
         }
       );
       const data = await res.json();
       if (data.error) throw new Error(data.error.message);
-      const imageData = data.predictions?.[0]?.bytesBase64Encoded;
-      if (!imageData) throw new Error('画像を生成できませんでした');
-      return new Response(JSON.stringify({ imageBase64: imageData }), {
-        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+
+      const parts = data.candidates?.[0]?.content?.parts || [];
+      const imgPart = parts.find(p => p.inlineData && p.inlineData.mimeType && p.inlineData.mimeType.startsWith('image/'));
+
+      if (imgPart) {
+        return new Response(JSON.stringify({ imageBase64: imgPart.inlineData.data }), {
+          status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      } else {
+        throw new Error('画像を生成できませんでした。もう一度お試しください。');
+      }
     }
 
     throw new Error('Invalid type');
