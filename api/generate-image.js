@@ -40,7 +40,7 @@ export default async function handler(req) {
     // 画像生成（Gemini Imagen3 Fast）
     if (type === 'image') {
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-fast-generate-001:predict?key=${GEMINI_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${GEMINI_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
