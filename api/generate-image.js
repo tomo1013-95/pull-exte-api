@@ -24,7 +24,10 @@ export default async function handler(req) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 300, temperature: 0.7 }
+            generationConfig: {
+              maxOutputTokens: 300,
+              temperature: 0.7
+            }
           }),
         }
       );
@@ -40,7 +43,7 @@ export default async function handler(req) {
     // 画像生成（Gemini 2.5 Flash Image）
     if (type === 'image') {
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${GEMINI_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -56,7 +59,9 @@ export default async function handler(req) {
       if (data.error) throw new Error(data.error.message);
 
       const parts = data.candidates?.[0]?.content?.parts || [];
-      const imgPart = parts.find(p => p.inlineData && p.inlineData.mimeType && p.inlineData.mimeType.startsWith('image/'));
+      const imgPart = parts.find(p =>
+        p.inlineData && p.inlineData.mimeType && p.inlineData.mimeType.startsWith('image/')
+      );
 
       if (imgPart) {
         return new Response(JSON.stringify({ imageBase64: imgPart.inlineData.data }), {
