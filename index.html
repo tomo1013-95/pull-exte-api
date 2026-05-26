@@ -914,7 +914,7 @@ function selectImageColor(id, hex, idx) {
     lengthLabel==='胸トップ上' ? 'chest length' :
     lengthLabel==='胸トップ下' ? 'below chest length' : 'waist length';
 
-  const prompt = 'Photorealistic beauty salon portrait photo. A young Japanese woman in her 20s, front view, gentle smile, looking at camera. Long straight sleek hair extensions reaching ' + lengthEn + '. Hair color: ' + colorName + ' (' + colorId + '), glossy silky smooth texture with natural shine. Soft studio lighting from front, pure white background. Professional lookbook photography, sharp focus, high resolution 4K, natural skin tone, natural makeup, simple light pink top. Ultra realistic human portrait photo, not illustration, not anime, not cartoon, not drawing.';
+  const prompt = 'professional beauty salon photo, photorealistic portrait, young Japanese woman 20s, front view, natural smile, long straight silky hair reaching ' + lengthEn + ', hair color ' + colorName + ' ' + colorId + ', glossy smooth hair, soft studio lighting, white background, 4K sharp focus, natural skin, light pink top, hyperrealistic photography, Canon 85mm, not anime not illustration';
 
   try {
     const res = await fetch('https://pull-exte-api.vercel.app/api/generate-image', {
