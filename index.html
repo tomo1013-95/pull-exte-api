@@ -407,59 +407,59 @@ function renderPhotoStep(){
       <div class="q-title">写真を追加してください</div>
       <div class="q-hint">撮影またはアップロードで追加できます。顔・髪全体と毛先の2枚で精度アップ！</div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-        <div>
-          <div style="font-size:11px;font-weight:700;color:#aaa;margin-bottom:6px;letter-spacing:.05em">① 顔・髪全体</div>
-          <div id="face-area" style="background:#f5f0ee;border:1.5px dashed #e0c8c0;border-radius:12px;aspect-ratio:3/4;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-            <canvas id="face-canvas" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></canvas>
-            <video id="face-video" autoplay playsinline muted style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></video>
-            <div id="face-ph" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#c8a898;pointer-events:none">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              <span style="font-size:11px;font-weight:500">追加してください</span>
-            </div>
-            <div id="face-ok" style="display:none;position:absolute;top:6px;right:6px;background:#c8806a;color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:2px 8px">✓ OK</div>
+      <!-- 顔・髪全体 -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:#aaa;margin-bottom:8px;letter-spacing:.05em">① 顔・髪全体</div>
+        <div id="face-area" style="background:#f5f0ee;border:1.5px dashed #e0c8c0;border-radius:12px;width:100%;height:200px;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <canvas id="face-canvas" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></canvas>
+          <video id="face-video" autoplay playsinline muted style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></video>
+          <div id="face-ph" style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#c8a898;pointer-events:none">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span style="font-size:13px;font-weight:500">タップして追加</span>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px">
-            <button onclick="startCam('face')" style="padding:8px 4px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:11px;font-family:inherit;cursor:pointer;font-weight:500;color:#555;transition:all .15s">📷 カメラ</button>
-            <button onclick="triggerUpload('face')" style="padding:8px 4px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:11px;font-family:inherit;cursor:pointer;font-weight:500;color:#555;transition:all .15s">⬆ 選択</button>
-          </div>
-          <div id="face-cam-controls" style="display:none;margin-top:4px">
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">
-              <button onclick="switchCam('face')" style="padding:7px 2px;border-radius:8px;border:1px solid #e0c8c0;background:#fdf5f3;font-size:10px;font-family:inherit;cursor:pointer;color:#c8806a;font-weight:600">🔄 切替</button>
-              <button onclick="snapCam('face')" style="padding:7px 2px;border-radius:8px;border:none;background:#c8806a;color:#fff;font-size:10px;font-family:inherit;cursor:pointer;font-weight:700">⭕ 撮影</button>
-              <button onclick="stopCam('face')" style="padding:7px 2px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:10px;font-family:inherit;cursor:pointer;color:#aaa">✕ 閉じる</button>
-            </div>
-          </div>
+          <div id="face-ok" style="display:none;position:absolute;top:8px;right:8px;background:#c8806a;color:#fff;border-radius:20px;font-size:11px;font-weight:700;padding:3px 10px">✓ OK</div>
         </div>
-
-        <div>
-          <div style="font-size:11px;font-weight:700;color:#aaa;margin-bottom:6px;letter-spacing:.05em">② 毛先の色</div>
-          <div id="tips-area" style="background:#f5f0ee;border:1.5px dashed #e0c8c0;border-radius:12px;aspect-ratio:3/4;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-            <canvas id="tips-canvas" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></canvas>
-            <video id="tips-video" autoplay playsinline muted style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></video>
-            <div id="tips-ph" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#c8a898;pointer-events:none">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              <span style="font-size:11px;font-weight:500">追加してください</span>
-            </div>
-            <div id="tips-ok" style="display:none;position:absolute;top:6px;right:6px;background:#c8806a;color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:2px 8px">✓ OK</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px">
-            <button onclick="startCam('tips')" style="padding:8px 4px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:11px;font-family:inherit;cursor:pointer;font-weight:500;color:#555;transition:all .15s">📷 カメラ</button>
-            <button onclick="triggerUpload('tips')" style="padding:8px 4px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:11px;font-family:inherit;cursor:pointer;font-weight:500;color:#555;transition:all .15s">⬆ 選択</button>
-          </div>
-          <div id="tips-cam-controls" style="display:none;margin-top:4px">
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">
-              <button onclick="switchCam('tips')" style="padding:7px 2px;border-radius:8px;border:1px solid #e0c8c0;background:#fdf5f3;font-size:10px;font-family:inherit;cursor:pointer;color:#c8806a;font-weight:600">🔄 切替</button>
-              <button onclick="snapCam('tips')" style="padding:7px 2px;border-radius:8px;border:none;background:#c8806a;color:#fff;font-size:10px;font-family:inherit;cursor:pointer;font-weight:700">⭕ 撮影</button>
-              <button onclick="stopCam('tips')" style="padding:7px 2px;border-radius:8px;border:1px solid #ddd;background:#fff;font-size:10px;font-family:inherit;cursor:pointer;color:#aaa">✕ 閉じる</button>
-            </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+          <button onclick="startCam('face')" style="padding:12px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:14px;font-family:inherit;cursor:pointer;font-weight:600;color:#555">📷 カメラ起動</button>
+          <button onclick="triggerUpload('face')" style="padding:12px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:14px;font-family:inherit;cursor:pointer;font-weight:600;color:#555">⬆ アップロード</button>
+        </div>
+        <div id="face-cam-controls" style="display:none;margin-top:8px">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+            <button onclick="switchCam('face')" style="padding:12px 4px;border-radius:10px;border:1px solid #e0c8c0;background:#fdf5f3;font-size:13px;font-family:inherit;cursor:pointer;color:#c8806a;font-weight:700">🔄 切替</button>
+            <button onclick="snapCam('face')" style="padding:12px 4px;border-radius:10px;border:none;background:#c8806a;color:#fff;font-size:13px;font-family:inherit;cursor:pointer;font-weight:700">⭕ 撮影</button>
+            <button onclick="stopCam('face')" style="padding:12px 4px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:13px;font-family:inherit;cursor:pointer;color:#aaa;font-weight:600">✕ 閉じる</button>
           </div>
         </div>
       </div>
 
-      <div style="font-size:11px;color:#bbb;text-align:center;margin-bottom:10px">※顔写真のみでも診断できます</div>
-      <button class="cam-btn primary" id="bdiag" onclick="doDiagnose()" style="display:none;width:100%">✦ 診断する</button>
-      <button onclick="renderQuestion(QUESTIONS.length-1)" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid #e8e6e0;background:transparent;color:#aaa;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500">← 前の質問に戻る</button>
+      <!-- 毛先 -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:#aaa;margin-bottom:8px;letter-spacing:.05em">② 毛先の色</div>
+        <div id="tips-area" style="background:#f5f0ee;border:1.5px dashed #e0c8c0;border-radius:12px;width:100%;height:200px;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <canvas id="tips-canvas" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></canvas>
+          <video id="tips-video" autoplay playsinline muted style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"></video>
+          <div id="tips-ph" style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#c8a898;pointer-events:none">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span style="font-size:13px;font-weight:500">タップして追加</span>
+          </div>
+          <div id="tips-ok" style="display:none;position:absolute;top:8px;right:8px;background:#c8806a;color:#fff;border-radius:20px;font-size:11px;font-weight:700;padding:3px 10px">✓ OK</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+          <button onclick="startCam('tips')" style="padding:12px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:14px;font-family:inherit;cursor:pointer;font-weight:600;color:#555">📷 カメラ起動</button>
+          <button onclick="triggerUpload('tips')" style="padding:12px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:14px;font-family:inherit;cursor:pointer;font-weight:600;color:#555">⬆ アップロード</button>
+        </div>
+        <div id="tips-cam-controls" style="display:none;margin-top:8px">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+            <button onclick="switchCam('tips')" style="padding:12px 4px;border-radius:10px;border:1px solid #e0c8c0;background:#fdf5f3;font-size:13px;font-family:inherit;cursor:pointer;color:#c8806a;font-weight:700">🔄 切替</button>
+            <button onclick="snapCam('tips')" style="padding:12px 4px;border-radius:10px;border:none;background:#c8806a;color:#fff;font-size:13px;font-family:inherit;cursor:pointer;font-weight:700">⭕ 撮影</button>
+            <button onclick="stopCam('tips')" style="padding:12px 4px;border-radius:10px;border:1px solid #ddd;background:#fff;font-size:13px;font-family:inherit;cursor:pointer;color:#aaa;font-weight:600">✕ 閉じる</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:#bbb;text-align:center;margin-bottom:12px">※顔写真のみでも診断できます</div>
+      <button class="cam-btn primary" id="bdiag" onclick="doDiagnose()" style="display:none;width:100%;padding:16px;font-size:15px">✦ 診断する</button>
+      <button onclick="renderQuestion(QUESTIONS.length-1)" style="width:100%;margin-top:10px;padding:12px;border-radius:10px;border:1px solid #e8e6e0;background:transparent;color:#aaa;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500">← 前の質問に戻る</button>
       <input type="file" id="fi-face" accept="image/*" style="display:none" onchange="loadImg(event,'face')">
       <input type="file" id="fi-tips" accept="image/*" style="display:none" onchange="loadImg(event,'tips')">
     </div>
@@ -497,17 +497,21 @@ function switchCam(target){
 
 function snapCam(target){
   const v = document.getElementById(target+'-video');
-  const c = document.getElementById(target+'-canvas');
-  c.width = v.videoWidth; c.height = v.videoHeight;
-  const ctx = c.getContext('2d');
-  // インカメの場合は左右反転
+  if(!v || !v.videoWidth) { alert('カメラが起動していません'); return; }
+  // 新しいcanvasを作って撮影
+  const tmpCanvas = document.createElement('canvas');
+  tmpCanvas.width = v.videoWidth;
+  tmpCanvas.height = v.videoHeight;
+  const ctx = tmpCanvas.getContext('2d');
   if(camFacingMode[target]==='user'){
-    ctx.scale(-1,1); ctx.drawImage(v,-c.width,0);
+    ctx.scale(-1,1);
+    ctx.drawImage(v,-tmpCanvas.width,0);
   } else {
     ctx.drawImage(v,0,0);
   }
+  // カメラを止めてからcanvasに表示
   stopCam(target);
-  processCanvas(c, target);
+  processCanvas(tmpCanvas, target);
 }
 
 function stopCam(target){
@@ -538,12 +542,15 @@ function loadImg(e, target){
 
 function processCanvas(srcCanvas, target){
   const displayCanvas = document.getElementById(target+'-canvas');
+  if(!displayCanvas){ return; }
   displayCanvas.width=srcCanvas.width;
   displayCanvas.height=srcCanvas.height;
   displayCanvas.getContext('2d').drawImage(srcCanvas,0,0);
   displayCanvas.style.display='block';
-  document.getElementById(target+'-ph').style.display='none';
-  document.getElementById(target+'-ok').style.display='block';
+  const ph = document.getElementById(target+'-ph');
+  if(ph) ph.style.display='none';
+  const ok = document.getElementById(target+'-ok');
+  if(ok) ok.style.display='block';
 
   // 色解析
   const w=srcCanvas.width, h=srcCanvas.height;
