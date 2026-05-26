@@ -815,10 +815,20 @@ async function callAI(hairLabel,matchTop,lighterTop,darkerTop,designPool,grade,l
   const toneMap={red:'赤み・オレンジ系',brown:'ナチュラルブラウン系',ash:'アッシュ・グレー系',beige:'ベージュ系',hiTone:'ハイトーン・ブリーチ系',vivid:'派手カラー'};
   const cond=[toneMap[toneVal]||'ナチュラルブラウン系',isBlack?'黒染めあり':'',isBleach?'ブリーチあり':''].filter(Boolean).join('、')||'特記なし';
   const tipsStr=hasTips?`毛先の明度${tipsL}%を基準にカラーを提案。`:'';
-  const prompt=`あなたはプロの美容師でプルエクステの専門家です。
-お客様：髪色「${hairLabel}」(${cond})、地毛の長さ「${hairlen}」、${gradeLabel}・${length}希望、毛量:${vol}、頭:${head}、カット:${cut?'重め':'普通'}。${tipsStr}
-現状に合うカラー：${matchStr}、明るくするなら：${lightStr}、暗くするなら：${darkStr}、取付け本数：${honsu}本。
-親しみやすい美容師口調で220字以内で、現状カラーの理由・チェンジカラーの提案・本数の理由を自然な文章で伝えてください。`;
+  const prompt=`以下のお客様情報に基づいて、プルエクステのカラーと本数についてアドバイスしてください。自己紹介は不要です。すぐにアドバイスの内容を話してください。
+
+お客様情報：
+- 髪色：${hairLabel}（${cond}）
+- 地毛の長さ：${hairlen}
+- 希望：${gradeLabel}・${length}仕上がり
+- 毛量：${vol}、頭の大きさ：${head}、カットライン：${cut?'重め':'普通'}
+${tipsStr}
+おすすめカラー：${matchStr}
+明るくするなら：${lightStr}
+暗くするなら：${darkStr}
+取付け本数：${honsu}本
+
+上記の情報をもとに、美容師らしい親しみやすい口調で200字以内で、①このカラーをおすすめする理由、②本数の説明、を自然な文章で伝えてください。`;
   try{
     const res=await fetch('https://pull-exte-api.vercel.app/api/generate-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'comment',prompt:prompt})});
     const data=await res.json();
