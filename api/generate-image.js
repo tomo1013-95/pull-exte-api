@@ -61,7 +61,7 @@ export default async function handler(req, res) {
     if (type === 'image') {
       const encodedPrompt = encodeURIComponent(prompt);
       const seed = Math.floor(Math.random() * 999999);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=640&seed=${seed}&model=flux&nologo=true`;
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=576&height=576&seed=${seed}&model=flux&nologo=true`;
       const imgResponse = await fetch(imageUrl);
       if (!imgResponse.ok) throw new Error('画像の生成に失敗しました');
       const arrayBuffer = await imgResponse.arrayBuffer();
