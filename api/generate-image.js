@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
     if (!GEMINI_KEY) return res.status(500).json({ error: 'API key not configured' });
 
-    // AIコメント生成（gemini-1.5-flash）
+    // AIコメント生成
     if (type === 'comment') {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
       const response = await fetch(url, {
@@ -23,12 +23,33 @@ export default async function handler(req, res) {
           generationConfig: { maxOutputTokens: 400, temperature: 0.7 }
         }),
       });
-      const data = await response.json();
-      if (data.error) return res.status(400).json({ error: data.error.message });
+
+      const rawText = await response.text();
+
+      // デバッグ：Geminiからの生レスポンスをログ
+      console.log('Gemini status:', response.status);
+      console.log('Gemini response:', rawText.substring(0, 500));
+
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch(e) {
+        return res.status(500).json({ error: 'Gemini parse error: ' + rawText.substring(0, 200) });
+      }
+
+      if (data.error) {
+        return res.status(400).json({ error: 'Gemini error: ' + JSON.stringify(data.error) });
+      }
+
       const text = (data.candidates?.[0]?.content?.parts?.[0]?.text || '')
         .replace(/\*\*/g, '')
         .replace(/([。！])/g, '$1\n')
         .trim();
+
+      if (!text) {
+        return res.status(400).json({ error: 'Empty response from Gemini: ' + rawText.substring(0, 200) });
+      }
+
       return res.status(200).json({ text });
     }
 
@@ -47,6 +68,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid type: ' + type });
 
   } catch (e) {
+    console.error('Handler error:', e.message);
     return res.status(500).json({ error: e.message || 'Unknown error' });
   }
 }
